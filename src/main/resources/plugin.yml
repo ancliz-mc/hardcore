@@ -1,0 +1,4 @@
+name: hardcore
+version: '1.0-SNAPSHOT'
+main: me.ancliz.hardcore.Hardcore
+api-version: '1.21'
