@@ -1,16 +1,15 @@
 package me.ancliz.hardcore;
 
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import me.ancliz.hardcore.commands.completers.DefaultTabCompleter;
 import me.ancliz.hardcore.listeners.PlayerDeathListener;
 import me.ancliz.hardcore.listeners.PlayerPortalListener;
+import me.ancliz.hardcore.listeners.PortalCreateListener;
 import me.ancliz.hardcore.util.LoggerWrapper;
 
 @SuppressWarnings("deprecation")
@@ -33,6 +32,7 @@ public final class Hardcore extends JavaPlugin {
     private void registerListeners() {
         Bukkit.getPluginManager().registerEvents(new PlayerDeathListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerPortalListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PortalCreateListener(), this);
         
     }
 
