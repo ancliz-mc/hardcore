@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
@@ -95,6 +96,15 @@ public class WorldAction {
             player.teleport(world.getSpawnLocation());
         }
         logger.info("Teleported players to {}", world.getName());
+    }
+
+    public boolean teleportToWorld(String worldName, Player player, double[] coords) {
+        World world = Bukkit.getWorld(worldName);
+        if(world == null) {
+            return false;
+        }
+        player.teleport(new Location(world, coords[0], coords[1], coords[2]));
+        return true;
     }
 
     public boolean teleportToWorld(String worldName, Player player) {
