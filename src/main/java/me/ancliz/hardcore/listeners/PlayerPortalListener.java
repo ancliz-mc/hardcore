@@ -20,9 +20,9 @@ public class PlayerPortalListener implements Listener {
         World from = event.getFrom().getWorld();
         String worldGroup = Metadata.getWorldGroup(from);
         logger.trace("PlayerPortalEvent - {} from {} to group {}", event.getPlayer().getName(), from.getName(), worldGroup);
+        Location location = event.getFrom().clone();
 
         if(cause == TeleportCause.NETHER_PORTAL) {
-            Location location = event.getFrom().clone();
 
             if(from.getEnvironment() == World.Environment.NORMAL) {
                 location.setX(location.getX() / 8);
@@ -33,12 +33,14 @@ public class PlayerPortalListener implements Listener {
                 location.setZ(location.getZ() * 8);
                 location.setWorld(Bukkit.getWorld(worldGroup));
             }
-
-            logger.debug("location {}, to before: {}", location, event.getTo());
-            event.setTo(location);
         } else if(cause == TeleportCause.END_PORTAL) {
-            logger.info("Player entered End portal");
+            logger.info("Player entered End portal {}", cause);
+            location.set(100.5, 49, 0.5);
+            location.setWorld(Bukkit.getWorld(worldGroup + "_the_end"));
         }
+
+        logger.debug("location {}, to before: {}", location, event.getTo());
+        event.setTo(location);
     }
 
 }
