@@ -1,9 +1,9 @@
-name: hardcore
+name: Hardcore
 version: '${version}'
 main: me.ancliz.hardcore.Hardcore
 api-version: '1.20'
 author: Ancliz
-website: https://github.com/Ancliz
+website: https://github.com/ancliz-mc/hardcore
 softdepend: [EssentialsX]
 
 
