@@ -43,7 +43,7 @@ public enum Command {
 
     private FileConfiguration loadCommands() {
         Hardcore plugin = Hardcore.getInstance();
-        InputStream commands = plugin.getResource("commands.yml");
+        InputStream commands = plugin.getEmbeddedResource("commands.yml");
 
         if(commands == null) {
             throw new RuntimeException("Commands file not found.");   
