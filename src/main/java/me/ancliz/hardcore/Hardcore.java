@@ -1,11 +1,20 @@
 package me.ancliz.hardcore;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import com.google.common.base.Charsets;
 import me.ancliz.hardcore.commands.completers.DefaultTabCompleter;
 import me.ancliz.hardcore.listeners.PlayerDeathListener;
 import me.ancliz.hardcore.listeners.PlayerPortalListener;
@@ -17,6 +26,32 @@ public final class Hardcore extends JavaPlugin {
     private static final LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
     private static Hardcore instance;
 
+    @Override
+    public InputStream getResource(String file) {
+        try {
+            return new FileInputStream(new File(getDataFolder(), file));
+        } catch(FileNotFoundException e) {}
+        logger.info("Getting embedded resource '{}'", file);
+        return super.getResource(file);
+    }
+
+    public InputStream getEmbeddedResource(String file) {
+        return super.getResource(file);
+    }
+
+    public YamlConfiguration getYaml(String file) {
+        Reader reader = new InputStreamReader(getResource(file), Charsets.UTF_8);
+        return YamlConfiguration.loadConfiguration(reader);
+    }
+
+    public void saveYaml(YamlConfiguration yaml, String file) {
+        try {
+            yaml.save(new File(getDataFolder(), file));
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     @Override
     public void onEnable() {
         instance = this;
