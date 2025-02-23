@@ -26,6 +26,10 @@ public final class Hardcore extends JavaPlugin {
     private static final LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
     private static Hardcore instance;
 
+    public void reload() {
+        reloadConfig();  
+    }
+
     @Override
     public InputStream getResource(String file) {
         try {
@@ -57,6 +61,8 @@ public final class Hardcore extends JavaPlugin {
         instance = this;
         setupCommands();
         registerListeners();
+        getConfig().options().copyDefaults(true);
+        saveDefaultConfig();
     }
 
     @Override

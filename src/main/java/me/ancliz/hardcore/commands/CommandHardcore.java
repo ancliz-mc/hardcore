@@ -64,7 +64,10 @@ public class CommandHardcore implements CommandExecutor {
 
         if(cmd == Command.VERSION) {
             player.sendMessage(MMFormatter.pluginMessage(Hardcore.getInstance().getDescription().getVersion()));
-        } else if(cmd == Command.HELP) {
+        } else if(cmd == Command.RELOAD) {
+            Hardcore.getInstance().reload();
+        }
+        else if(cmd == Command.HELP) {
             help(player, arguments);
         } else if(cmd == Command.WORLD) {
             player.sendMessage(MMFormatter.pluginMessage("You are currently in: " + player.getWorld().getName()));

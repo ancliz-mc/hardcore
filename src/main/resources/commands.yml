@@ -1,10 +1,3 @@
-help:
-  description: Display all Hardcore commands and descriptions.
-  aliases:
-    - h
-    - '?'
-    - '-h'
-
 version:
   description: The current version of Hardcore.
   aliases:
@@ -13,26 +6,16 @@ version:
     - -v
     - -version
 
-new:
-  description: Create a new world.
-  usage: new <world>
+reload:
+  description:
   aliases:
-    - create
 
-unload:
-  description: Unload a world.
-  usage: unload <world>
-
-goto:
-  description: Teleport player(s) to a world.
-  usage: goto <world>
+help:
+  description: Display all Hardcore commands and descriptions.
   aliases:
-    - tp
-    - ch
-
-delete:
-  description: Delete a world.
-  usage: delete <world>
+    - h
+    - '?'
+    - '-h'
 
 world:
   description: Display the world you are currently in.
@@ -45,3 +28,24 @@ list:
   usage: list
   aliases:
     - ls
+
+goto:
+  description: Teleport player(s) to a world.
+  usage: goto <world>
+  aliases:
+    - tp
+    - ch
+
+new:
+  description: Create a new world.
+  usage: new <world>
+  aliases:
+    - create
+
+unload:
+  description: Unload a world.
+  usage: unload <world>
+
+delete:
+  description: Delete a world.
+  usage: delete <world>

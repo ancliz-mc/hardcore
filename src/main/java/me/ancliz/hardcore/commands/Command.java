@@ -15,13 +15,14 @@ import me.ancliz.hardcore.util.LoggerWrapper;
 
 public enum Command {
     VERSION,
+    RELOAD,
     HELP,
+    WORLD,
+    LIST,
     NEW,
     GOTO,
-    DELETE,
     UNLOAD,
-    WORLD,
-    LIST;
+    DELETE;
     
     private List<String> aliases = new ArrayList<>();
     private String description = "";
@@ -31,12 +32,12 @@ public enum Command {
     Command() {
         FileConfiguration yaml = loadCommands();
         ConfigurationSection command = yaml.getConfigurationSection(this.toString().toLowerCase());
-        try {
+        if(command != null) {
             aliases = command.getStringList("aliases");
             aliases.add(toString());
             description = command.getString("description", "");
             usage = command.getString("usage", "");
-        } catch(NullPointerException e) {
+        } else {
             logger.error("Command enum mismatch: {} not found in commands.yml", toString());
         }
     }

@@ -6,19 +6,53 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import me.ancliz.hardcore.Hardcore;
 import me.ancliz.hardcore.WorldMetaData;
 import me.ancliz.hardcore.util.LoggerWrapper;
 
 public class WorldAction {
     LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
 
-    public void groupMetadata(World world, Map<String, WorldMetaData> data) {
+    @SuppressWarnings("unchecked")
+    private <T> void setGameRules(World world, ConfigurationSection rules, Class<T> clazz) {
+        if(rules != null) {
+            logger.trace("Setting gamerules for {}", world);
+            rules.getKeys(false).forEach(key -> {
+                GameRule<T> rule = (GameRule<T>) GameRule.getByName(key);
+                world.setGameRule(rule, (T) rules.get(key));
+                logger.trace(rule.toString());
+            });
+        }
+    }
+
+    private void loadGameRules(World world) {
+        FileConfiguration config = Hardcore.getInstance().getConfig();
+        setGameRules(world, config.getConfigurationSection("gamerules.boolean"), Boolean.class);
+        setGameRules(world, config.getConfigurationSection("gamerules.integer"), Integer.class);
+    }
+
+    public void revokeAdvancements() {
+        if(Hardcore.getInstance().getConfig().getBoolean("revoke-advancements")) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement revoke @a everything");
+        }
+    }
+
+    public void reset(World world) {
+        loadGameRules(world);
+        revokeAdvancements();
+    }
+
+    public void setMetadataAndSettings(World world, Map<String, WorldMetaData> data) {
         data.forEach(world::setMetadata);
+        reset(world);
     }
 
     public World createWorld(String fullyQualifiedName, Environment environment) {
@@ -28,7 +62,7 @@ public class WorldAction {
     public World createWorld(String fullyQualifiedName, Environment environment, Map<String, WorldMetaData> data) {
         if(!Bukkit.isTickingWorlds()) {
             WorldCreator creator = new WorldCreator(fullyQualifiedName).environment(environment);
-            groupMetadata(Bukkit.createWorld(creator), data);
+            setMetadataAndSettings(Bukkit.createWorld(creator), data);
             logger.info("New world '{}' created.", fullyQualifiedName);
         }
         return null;
@@ -57,8 +91,6 @@ public class WorldAction {
 
     public String unloadWorld(String world) throws NullPointerException {
         String path = Bukkit.getWorld(world).getWorldFolder().getAbsolutePath();
-        logger.info("Unloading {}", world);
-
         if(!Bukkit.isTickingWorlds()) {
             if(Bukkit.unloadWorld(world, false)) {
                 logger.info("Unloaded {}", world);
@@ -70,7 +102,6 @@ public class WorldAction {
     public boolean deleteWorld(String worldName) {
         World world = Bukkit.getWorld(worldName);
         logger.warn("Deleting {}", worldName);
-        
         if(world == null) {
             File file = new File(Bukkit.getServer().getWorldContainer() + "/" + worldName);
             if(file.exists()) {
@@ -83,8 +114,8 @@ public class WorldAction {
 
     private void delete(File file) {
         File[] files = file.listFiles();
-        if (files != null) {
-            for (File f : files) {
+        if(files != null) {
+            for(File f : files) {
                 delete(f);
             }
         }
