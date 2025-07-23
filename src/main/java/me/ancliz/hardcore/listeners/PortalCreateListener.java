@@ -1,13 +1,12 @@
 package me.ancliz.hardcore.listeners;
 
-import org.apache.logging.log4j.LogManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.PortalCreateEvent;
-import me.ancliz.hardcore.util.LoggerWrapper;
+import me.ancliz.util.logging.Logger;
 
 public class PortalCreateListener implements Listener {
-    LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
+    private final Logger logger = new Logger(this.getClass());
     
     @EventHandler
     public void onPortalCreate(PortalCreateEvent event) { 

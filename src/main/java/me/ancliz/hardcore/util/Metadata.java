@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
-import org.apache.logging.log4j.LogManager;
 import org.bukkit.World;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;
 import org.bukkit.plugin.Plugin;
 import me.ancliz.hardcore.Hardcore;
+import me.ancliz.util.logging.Logger;
 
 public class Metadata {
-    private static LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
+    private static final Logger logger = new Logger(Metadata.class);
     private static Plugin plugin = Hardcore.getInstance();
 
     public static String getWorldGroup(World world) {

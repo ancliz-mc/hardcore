@@ -1,149 +1,155 @@
 package me.ancliz.hardcore.commands;
 
-import java.util.Arrays;
-import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World.Environment;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
-import me.ancliz.hardcore.MMFormatter;
 import me.ancliz.hardcore.actions.WorldAction;
-import me.ancliz.hardcore.util.LoggerWrapper;
+import me.ancliz.minecraft.MMFormatter;
+import me.ancliz.minecraft.commands.CommandManager;
+import me.ancliz.minecraft.commands.DefaultCommandHandler;
 
 @SuppressWarnings("deprecation")
-public class CommandHardcore implements CommandExecutor {
-    private LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
+public class CommandHardcore extends DefaultCommandHandler {
     private WorldAction worldAction;
 
-    public CommandHardcore() {
+    public CommandHardcore(CommandManager commandManager) {
+        super(commandManager);
+        formatter = new MMFormatter(Hardcore.getInstance().getName(), commandManager);
         worldAction = new WorldAction();
+        commandManager.registerHandler("hardcore.version", this::version);
+        commandManager.registerHandler("hardcore.help", this::help);
+        commandManager.registerHandler("hardcore.world", this::handleWorld);
+        commandManager.registerHandler("hardcore.new", this::handleNew);
+        commandManager.registerHandler("hardcore.goto", this::handleGoto);
+        commandManager.registerHandler("hardcore.unload", this::handleUnload);
+        commandManager.registerHandler("hardcore.delete", this::handleDelete);
+        commandManager.registerHandler("hardcore.list", this::handleList);
     }
 
-    private boolean handleNew(Player player, String[] args) {
-        Environment environment = Environment.NORMAL;
-        if(args.length != 3) {
+    @Override
+    public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+        if(args.length < 1) {
+            help(sender, args);
             return false;
         }
 
-        switch(args[1].toLowerCase()) {
+        return super.onCommand(sender, command, label, args);
+    }
+
+    private boolean version(CommandSender sender, String[] args) {
+        sender.sendMessage(formatter.pluginMessage(Hardcore.getInstance().getDescription().getVersion()));
+        return true;
+    }
+
+    private boolean handleWorld(CommandSender sender, String[] args) {
+        if(!(sender instanceof Player player) || args.length > 0) {
+            return false;
+        }
+        player.sendMessage(formatter.pluginMessage("You are currently in: " + player.getWorld().getName()));
+        return true;
+    }
+
+    private boolean handleNew(CommandSender sender, String[] args) {
+        Environment environment = Environment.NORMAL;
+        if(args.length < 2 || args.length > 3) {
+            return false;
+        }
+
+        switch(args[0].toLowerCase()) {
             case "nether": environment = Environment.NETHER;  break;
             case "end":    environment = Environment.THE_END; break;
         }
         
-        worldAction.createWorld(args[2], environment);
-        player.sendMessage(MMFormatter.pluginMessage(args[2] + " created."));
+        worldAction.createWorld(args[1], environment);
+        sender.sendMessage(formatter.pluginMessage(args[1] + " created."));
         return true;
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] arguments) {
-        if(arguments.length < 1) {
-            help(sender, arguments);
-            return false;
-        }
-        
-        Player player = null;
-
-        if(sender instanceof Player) {
-            player = (Player) sender;
+    private boolean handleGoto(CommandSender sender, String[] args) {
+        if(!(sender instanceof Player player)) {
+            return true;
         }
 
-        String subCommand = arguments[0];
-        String[] args = arguments.length > 1 ? Arrays.copyOfRange(arguments, 2, arguments.length) : new String[0];
-        Command cmd = getCommand(subCommand);
-        boolean valid = true;
-
-        if(cmd == null) {
-            return false;
-        }
-
-        logger.trace("args: {}", Arrays.toString(args));
-
-        if(cmd == Command.VERSION) {
-            player.sendMessage(MMFormatter.pluginMessage(Hardcore.getInstance().getDescription().getVersion()));
-        } else if(cmd == Command.RELOAD) {
-            Hardcore.getInstance().reload();
-        }
-        else if(cmd == Command.HELP) {
-            help(player, arguments);
-        } else if(cmd == Command.WORLD) {
-            player.sendMessage(MMFormatter.pluginMessage("You are currently in: " + player.getWorld().getName()));
-        } else if(cmd == Command.NEW) {
-            valid = handleNew(player, arguments);
-        } else if(cmd == Command.GOTO) {
-            if(args.length == 0) {
-                worldAction.teleportToWorld(arguments[1], player);
-            } else {
-                double[] coords = new double[3];
-                try {
-                    coords[0] = Double.parseDouble(args[0]);
-                    coords[1] = args.length == 2 ? player.getLocation().getY() : Double.parseDouble(args[1]);
-                    coords[2] = Double.parseDouble(args[args.length == 2 ? 1 : 2]);
-                } catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    player.sendMessage(MMFormatter.pluginMessage("Invalid coordinates."));
-                    valid = false;
-                }
-                worldAction.teleportToWorld(arguments[1], player, coords);
-            }
-        } else if(cmd == Command.UNLOAD) {
-            try {
-                worldAction.unloadWorld(arguments[1]);
-                player.sendMessage(MMFormatter.pluginMessage(arguments[1] + " unloaded."));
-            } catch(NullPointerException e) {
-                player.sendMessage(MMFormatter.pluginMessage("World does not exist."));
-            }
-        } else if(cmd == Command.DELETE) {
-            if(worldAction.deleteWorld(arguments[1])) {
-                player.sendMessage(MMFormatter.pluginMessage("World deleted."));
-            } else {
-                player.sendMessage(MMFormatter.pluginMessage("World is still loaded, unable to delete."));
-            }
-        } else if(cmd == Command.LIST) {
-            player.sendMessage(MMFormatter.pluginMessage("Worlds: " + Bukkit.getWorlds().toString()));
+        if(args.length == 1) {
+            return worldAction.teleportToWorld(args[0], player);
         } else {
-            valid = false;
-        }
-
-        return valid;
+            double[] coords = new double[3];
+            try {
+                coords[0] = Double.parseDouble(args[0]);
+                coords[1] = args.length == 2 ? player.getLocation().getY() : Double.parseDouble(args[1]);
+                coords[2] = Double.parseDouble(args[args.length == 2 ? 1 : 2]);
+            } catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                player.sendMessage(formatter.pluginMessage("Invalid coordinates."));
+                return false;
+            }
+            worldAction.teleportToWorld(args[0], player, coords);
+            return true;
+         }
 
     }
-    
-    private void help(CommandSender player, String[] args) {
+
+    private boolean handleUnload(CommandSender sender, String[] args) {
+        String message;
+        try {
+            worldAction.unloadWorld(args[0]);
+            message = args[0] + " unloaded.";
+        } catch(NullPointerException e) {
+            message = "World does not exist.";
+        }
+
+        if(sender instanceof Player player) {
+            player.sendMessage(formatter.pluginMessage(message));
+        } else {
+            sender.sendMessage(message);
+        }
+
+        return true;
+    }
+
+    private boolean handleDelete(CommandSender sender, String[] args) {
+        boolean deleted = worldAction.deleteWorld(args[0]);
+        String message = deleted ? "World deleted." : "World is still loaded, unable to delete.";
+
+        if(sender instanceof Player player) {
+            player.sendMessage(formatter.pluginMessage(message));
+        } else {
+            sender.sendMessage(message);
+        }
+
+        return true;
+    }
+
+    private boolean handleList(CommandSender sender, String[] args) {
+        if(sender instanceof Player player) {
+            player.sendMessage(formatter.pluginMessage("Worlds: " + Bukkit.getWorlds()));
+        } else {
+            sender.sendMessage("Worlds: " + Bukkit.getWorlds());
+        }
+
+        return true;
+    }
+
+    private boolean help(CommandSender sender, String[] args) {
         int maxPageLines = 9;
-        int commandsLength = Command.values().length;
+        int commandsLength = commandManager.getTopLevel().size() + commandManager.getLevelOne().size();
         int totalPages = commandsLength / maxPageLines + (commandsLength % maxPageLines == 0 ? 0 : 1);
 
         try {
-            int page = Integer.parseInt(args[1]);
+            int page = Integer.parseInt(args[0]);
             if(page > totalPages) {
                 throw new NumberFormatException();
             }
-            player.sendMessage(MMFormatter.help(page, totalPages, maxPageLines));
+            sender.sendMessage(formatter.help(page, totalPages, maxPageLines));
         } catch(NumberFormatException e) {
-            player.sendMessage(MMFormatter.format("Unknown Chapter", ChatColor.DARK_RED));
+            sender.sendMessage(formatter.format("Unknown Chapter", ChatColor.DARK_RED));
         } catch(ArrayIndexOutOfBoundsException e) {
-            player.sendMessage(MMFormatter.help(1, totalPages, maxPageLines));
-        }
-    }
-
-    private Command getCommand(String commandStr) {
-        Command command = null;
-        for(Command cmd : Command.values()) {
-            for(String alias : cmd.aliases()) {
-                if(commandStr.equalsIgnoreCase(alias)) {
-                    command = cmd;
-                    break;
-                }
-            }
-            if(command != null) {
-                break;
-            }
+            sender.sendMessage(formatter.help(1, totalPages, maxPageLines));
         }
 
-        return command;
+        return true;
     }
-    
+
 }

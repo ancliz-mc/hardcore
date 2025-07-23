@@ -4,3 +4,4 @@ revoke-advancements: true
 gamerules:
   boolean:
     naturalRegeneration: false
+plugin-chat-colour: red

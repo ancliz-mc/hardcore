@@ -1,6 +1,5 @@
 package me.ancliz.hardcore.listeners;
 
-import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,18 +11,19 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import me.ancliz.hardcore.Hardcore;
 import me.ancliz.hardcore.WorldMetaData;
 import me.ancliz.hardcore.actions.WorldAction;
-import me.ancliz.hardcore.util.LoggerWrapper;
 import me.ancliz.hardcore.util.Metadata;
+import me.ancliz.minecraft.AnkyPlugin;
+import me.ancliz.util.logging.Logger;
 
 public class PlayerDeathListener implements Listener {
-    private static final LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
+    private final Logger logger = new Logger(this.getClass());
     private WorldAction worldAction;
     private YamlConfiguration statistics;
-    private Hardcore plugin;
+    private AnkyPlugin plugin;
 
     public PlayerDeathListener() {
         plugin = Hardcore.getInstance();
-        statistics = plugin.getYaml("statistics.yml");
+        statistics = plugin.getYaml("statistics.yml", false);
         worldAction = new WorldAction();
     }
 
@@ -62,6 +62,15 @@ public class PlayerDeathListener implements Listener {
         }, config.getLong("world-delete-delay"));
 
         plugin.saveYaml(statistics, "statistics.yml");
+        
+        // Properties properties = new Properties();
+        // try {
+        //     properties.load(new FileInputStream("server.properties"));
+        //     properties.setProperty("level-name", newWorldGroup);
+        //     properties.store(new FileOutputStream("server.properties"), newWorldGroup);
+        // } catch(IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
 }

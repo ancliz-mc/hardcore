@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -16,10 +15,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
 import me.ancliz.hardcore.WorldMetaData;
-import me.ancliz.hardcore.util.LoggerWrapper;
+import me.ancliz.util.logging.Logger;
 
 public class WorldAction {
-    LoggerWrapper logger = new LoggerWrapper(LogManager.getLogger());
+    private final Logger logger = new Logger(this.getClass());
 
     @SuppressWarnings("unchecked")
     private <T> void setGameRules(World world, ConfigurationSection rules, Class<T> clazz) {
