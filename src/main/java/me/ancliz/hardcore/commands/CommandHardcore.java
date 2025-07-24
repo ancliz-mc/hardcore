@@ -3,35 +3,30 @@ package me.ancliz.hardcore.commands;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World.Environment;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
-import me.ancliz.hardcore.MMFormatter;
 import me.ancliz.hardcore.actions.WorldAction;
+import me.ancliz.minecraft.MMFormatter;
+import me.ancliz.minecraft.commands.CommandManager;
+import me.ancliz.minecraft.commands.DefaultCommandHandler;
 
 @SuppressWarnings("deprecation")
-public class CommandHardcore implements CommandExecutor {
+public class CommandHardcore extends DefaultCommandHandler {
     private WorldAction worldAction;
 
-    public CommandHardcore() {
+    public CommandHardcore(CommandManager commandManager) {
+        super(commandManager);
+        formatter = new MMFormatter(Hardcore.getInstance().getName(), commandManager);
         worldAction = new WorldAction();
-    }
-
-    private boolean handleNew(Player player, String[] args) {
-        Environment environment = Environment.NORMAL;
-        if(args.length != 3) {
-            return false;
-        }
-
-        switch(args[1].toLowerCase()) {
-            case "nether": environment = Environment.NETHER;  break;
-            case "end":    environment = Environment.THE_END; break;
-        }
-        
-        worldAction.createWorld(args[2], environment);
-        player.sendMessage(MMFormatter.pluginMessage(args[2] + " created."));
-        return true;
+        commandManager.registerHandler("hardcore.version", this::version);
+        commandManager.registerHandler("hardcore.help", this::help);
+        commandManager.registerHandler("hardcore.world", this::handleWorld);
+        commandManager.registerHandler("hardcore.new", this::handleNew);
+        commandManager.registerHandler("hardcore.goto", this::handleGoto);
+        commandManager.registerHandler("hardcore.unload", this::handleUnload);
+        commandManager.registerHandler("hardcore.delete", this::handleDelete);
+        commandManager.registerHandler("hardcore.list", this::handleList);
     }
 
     @Override
@@ -41,81 +36,120 @@ public class CommandHardcore implements CommandExecutor {
             return false;
         }
 
-        String subCommand = args[0];
-        Command cmd = getCommand(subCommand);
-        boolean valid = true;
+        return super.onCommand(sender, command, label, args);
+    }
 
-        if(cmd == null) {
+    private boolean version(CommandSender sender, String[] args) {
+        sender.sendMessage(formatter.pluginMessage(Hardcore.getInstance().getDescription().getVersion()));
+        return true;
+    }
+
+    private boolean handleWorld(CommandSender sender, String[] args) {
+        if(!(sender instanceof Player player) || args.length > 0) {
+            return false;
+        }
+        player.sendMessage(formatter.pluginMessage("You are currently in: " + player.getWorld().getName()));
+        return true;
+    }
+
+    private boolean handleNew(CommandSender sender, String[] args) {
+        Environment environment = Environment.NORMAL;
+        if(args.length < 2 || args.length > 3) {
             return false;
         }
 
-        if(cmd == Command.VERSION) {
-            sender.sendMessage(MMFormatter.pluginMessage(Hardcore.getInstance().getDescription().getVersion()));
-        } else if(cmd == Command.HELP) {
-            help(sender, args);
-        } else if(cmd == Command.WORLD) {
-            Player player = (Player) sender;
-            player.sendMessage(MMFormatter.pluginMessage("You are currently in: " + player.getWorld().getName()));
-        } else if(cmd == Command.NEW) {
-            valid = handleNew((Player) sender, args);
-        } else if(cmd == Command.GOTO) {
-            worldAction.teleportToWorld(args[1], (Player) sender);
-        } else if(cmd == Command.UNLOAD) {
-            try {
-                worldAction.unloadWorld(args[1]);
-                sender.sendMessage(MMFormatter.pluginMessage(args[1] + " unloaded."));
-            } catch(NullPointerException e) {
-                sender.sendMessage(MMFormatter.pluginMessage("World does not exist."));
-            }
-        } else if(cmd == Command.DELETE) {
-            if(worldAction.deleteWorld(args[1])) {
-                sender.sendMessage(MMFormatter.pluginMessage("World deleted."));
-            } else {
-                sender.sendMessage(MMFormatter.pluginMessage("World is still loaded, unable to delete."));
-            }
-        } else if(cmd == Command.LIST) {
-            sender.sendMessage(MMFormatter.pluginMessage("Worlds: " + Bukkit.getWorlds().toString()));
-        } else {
-            valid = false;
+        switch(args[0].toLowerCase()) {
+            case "nether": environment = Environment.NETHER;  break;
+            case "end":    environment = Environment.THE_END; break;
+        }
+        
+        worldAction.createWorld(args[1], environment);
+        sender.sendMessage(formatter.pluginMessage(args[1] + " created."));
+        return true;
+    }
+
+    private boolean handleGoto(CommandSender sender, String[] args) {
+        if(!(sender instanceof Player player)) {
+            return true;
         }
 
-        return valid;
+        if(args.length == 1) {
+            return worldAction.teleportToWorld(args[0], player);
+        } else {
+            double[] coords = new double[3];
+            try {
+                coords[0] = Double.parseDouble(args[0]);
+                coords[1] = args.length == 2 ? player.getLocation().getY() : Double.parseDouble(args[1]);
+                coords[2] = Double.parseDouble(args[args.length == 2 ? 1 : 2]);
+            } catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                player.sendMessage(formatter.pluginMessage("Invalid coordinates."));
+                return false;
+            }
+            worldAction.teleportToWorld(args[0], player, coords);
+            return true;
+         }
 
     }
-    
-    private void help(CommandSender sender, String[] args) {
+
+    private boolean handleUnload(CommandSender sender, String[] args) {
+        String message;
+        try {
+            worldAction.unloadWorld(args[0]);
+            message = args[0] + " unloaded.";
+        } catch(NullPointerException e) {
+            message = "World does not exist.";
+        }
+
+        if(sender instanceof Player player) {
+            player.sendMessage(formatter.pluginMessage(message));
+        } else {
+            sender.sendMessage(message);
+        }
+
+        return true;
+    }
+
+    private boolean handleDelete(CommandSender sender, String[] args) {
+        boolean deleted = worldAction.deleteWorld(args[0]);
+        String message = deleted ? "World deleted." : "World is still loaded, unable to delete.";
+
+        if(sender instanceof Player player) {
+            player.sendMessage(formatter.pluginMessage(message));
+        } else {
+            sender.sendMessage(message);
+        }
+
+        return true;
+    }
+
+    private boolean handleList(CommandSender sender, String[] args) {
+        if(sender instanceof Player player) {
+            player.sendMessage(formatter.pluginMessage("Worlds: " + Bukkit.getWorlds()));
+        } else {
+            sender.sendMessage("Worlds: " + Bukkit.getWorlds());
+        }
+
+        return true;
+    }
+
+    private boolean help(CommandSender sender, String[] args) {
         int maxPageLines = 9;
-        int commandsLength = Command.values().length;
+        int commandsLength = commandManager.getTopLevel().size() + commandManager.getLevelOne().size();
         int totalPages = commandsLength / maxPageLines + (commandsLength % maxPageLines == 0 ? 0 : 1);
 
         try {
-            int page = Integer.parseInt(args[1]);
+            int page = Integer.parseInt(args[0]);
             if(page > totalPages) {
                 throw new NumberFormatException();
             }
-            sender.sendMessage(MMFormatter.help(page, totalPages, maxPageLines));
+            sender.sendMessage(formatter.help(page, totalPages, maxPageLines));
         } catch(NumberFormatException e) {
-            sender.sendMessage(MMFormatter.format("Unknown Chapter", ChatColor.DARK_RED));
+            sender.sendMessage(formatter.format("Unknown Chapter", ChatColor.DARK_RED));
         } catch(ArrayIndexOutOfBoundsException e) {
-            sender.sendMessage(MMFormatter.help(1, totalPages, maxPageLines));
-        }
-    }
-
-    private Command getCommand(String commandStr) {
-        Command command = null;
-        for(Command cmd : Command.values()) {
-            for(String alias : cmd.aliases()) {
-                if(commandStr.equalsIgnoreCase(alias)) {
-                    command = cmd;
-                    break;
-                }
-            }
-            if(command != null) {
-                break;
-            }
+            sender.sendMessage(formatter.help(1, totalPages, maxPageLines));
         }
 
-        return command;
+        return true;
     }
-    
+
 }

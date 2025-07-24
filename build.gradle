@@ -1,10 +1,13 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.gradleup.shadow' version '8.3.6'
 }
 
 group = 'me.ancliz'
-version = '0.0.1'
+version = '0.2.0'
+
+def GRADLE_HOME = System.getenv('GRADLE_HOME')
+def JAVA_LIB = System.getenv('JAVA_LIB')
 
 repositories {
     mavenCentral()
@@ -20,6 +23,9 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        url = uri(JAVA_LIB)
+    }
 }
 
 dependencies {
@@ -27,7 +33,11 @@ dependencies {
     compileOnly 'net.essentialsx:EssentialsX:2.20.1'
     implementation 'org.apache.logging.log4j:log4j-api:2.22.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.22.1'
+    implementation 'me.ancliz:AnkyPlugin:0.0.1-beta3'
+    implementation 'me.ancliz:anky-util:0.0.1'
 }
+
+apply from: GRADLE_HOME + '/scripts/ankyplugin.gradle'
 
 tasks.shadowJar {
     destinationDirectory = file("F:/Users/Atlantor/Projects/Minecraft/hardcore_test/plugins")

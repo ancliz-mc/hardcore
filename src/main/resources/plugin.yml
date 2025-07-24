@@ -1,15 +1,75 @@
-name: hardcore
+name: Hardcore
 version: '${version}'
 main: me.ancliz.hardcore.Hardcore
 api-version: '1.20'
 author: Ancliz
-website: https://github.com/Ancliz
+website: https://github.com/ancliz-mc/hardcore
 softdepend: [EssentialsX]
-
 
 commands:
   hardcore:
-    description: Hardcore related commands. Type /hardcore help for a full list.
-    permission: hardcore.administrator
     aliases:
-     - hc
+      - hc
+    usage: /hardcore help
+    sub-commands:
+      reload:
+        description: Reload the plugin.
+
+      version:
+        description: The current version of ${rootProject.name}.
+        top-level-aliases:
+          - hcv
+        aliases:
+          - ver
+          - v
+          - -v
+          - -version
+
+      help:
+        description: Display all ${rootProject.name} commands and descriptions.
+        aliases:
+          - h
+          - '?'
+          - '-h'
+        top-level-aliases:
+          - hch
+
+      world:
+        description: Display the world you are currently in.
+        usage: /hardcore world
+        top-level-aliases:
+          - hcw
+        aliases:
+          - w
+
+      list:
+        description: List all loaded worlds.
+        usage: /hardcore list
+        top-level-aliases:
+          - hcl
+        aliases:
+          - l
+          - ls
+
+      goto:
+        description: Teleport player(s) to a world.
+        usage: /hardcore goto <world>
+        aliases:
+          - tp
+          - ch
+
+      new:
+        description: Create a new world.
+        usage: /hardcore new <world>
+        top-level-aliases:
+          - hcnew
+        aliases:
+        - create
+
+      unload:
+        description: Unload a world.
+        usage: /hardcore unload <world>
+
+      delete:
+        description: Delete a world.
+        usage: /hardcore delete <world>

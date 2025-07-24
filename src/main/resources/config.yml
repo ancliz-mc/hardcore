@@ -1,0 +1,7 @@
+world-teleport-delay: 30
+world-delete-delay: 80
+revoke-advancements: true
+gamerules:
+  boolean:
+    naturalRegeneration: false
+plugin-chat-colour: red
