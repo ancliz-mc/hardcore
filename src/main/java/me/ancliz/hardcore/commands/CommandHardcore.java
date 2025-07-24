@@ -1,23 +1,23 @@
 package me.ancliz.hardcore.commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
 import me.ancliz.hardcore.actions.WorldAction;
-import me.ancliz.minecraft.MMFormatter;
 import me.ancliz.minecraft.commands.CommandManager;
-import me.ancliz.minecraft.commands.DefaultCommandHandler;
+import me.ancliz.minecraft.commands.DefaultCommandExecutor;
 
-@SuppressWarnings("deprecation")
-public class CommandHardcore extends DefaultCommandHandler {
+public class CommandHardcore extends DefaultCommandExecutor {
     private WorldAction worldAction;
 
     public CommandHardcore(CommandManager commandManager) {
         super(commandManager);
-        formatter = new MMFormatter(Hardcore.getInstance().getName(), commandManager);
         worldAction = new WorldAction();
         commandManager.registerHandler("hardcore.version", this::version);
         commandManager.registerHandler("hardcore.help", this::help);
@@ -40,7 +40,7 @@ public class CommandHardcore extends DefaultCommandHandler {
     }
 
     private boolean version(CommandSender sender, String[] args) {
-        sender.sendMessage(formatter.pluginMessage(Hardcore.getInstance().getDescription().getVersion()));
+        messageSender.sendMessage(sender, Hardcore.getInstance().getDescription().getVersion(), formatter::pluginMessage);
         return true;
     }
 
@@ -64,7 +64,7 @@ public class CommandHardcore extends DefaultCommandHandler {
         }
         
         worldAction.createWorld(args[1], environment);
-        sender.sendMessage(formatter.pluginMessage(args[1] + " created."));
+        messageSender.sendMessage(sender, args[1] + " created.", formatter::pluginMessage);
         return true;
     }
 
@@ -100,11 +100,7 @@ public class CommandHardcore extends DefaultCommandHandler {
             message = "World does not exist.";
         }
 
-        if(sender instanceof Player player) {
-            player.sendMessage(formatter.pluginMessage(message));
-        } else {
-            sender.sendMessage(message);
-        }
+        messageSender.sendMessage(sender, message, formatter::pluginMessage);
 
         return true;
     }
@@ -112,43 +108,55 @@ public class CommandHardcore extends DefaultCommandHandler {
     private boolean handleDelete(CommandSender sender, String[] args) {
         boolean deleted = worldAction.deleteWorld(args[0]);
         String message = deleted ? "World deleted." : "World is still loaded, unable to delete.";
-
-        if(sender instanceof Player player) {
-            player.sendMessage(formatter.pluginMessage(message));
-        } else {
-            sender.sendMessage(message);
-        }
-
+        messageSender.sendMessage(sender, message, formatter::pluginMessage);
         return true;
     }
 
     private boolean handleList(CommandSender sender, String[] args) {
-        if(sender instanceof Player player) {
-            player.sendMessage(formatter.pluginMessage("Worlds: " + Bukkit.getWorlds()));
-        } else {
-            sender.sendMessage("Worlds: " + Bukkit.getWorlds());
+        List<String> worldNames = new ArrayList<>();
+        List<ChatColor> worldColours = new ArrayList<>();
+        worldColours.add(ChatColor.GOLD);
+        worldColours.add(ChatColor.WHITE);
+
+        for(World world : Bukkit.getWorlds()) {
+            worldNames.add(formatter.D + world.getName() + "::" + world.getEnvironment());
+
+            ChatColor color = switch (world.getEnvironment()) {
+                case NORMAL -> ChatColor.DARK_GREEN;
+                case NETHER -> ChatColor.RED;
+                case THE_END -> ChatColor.DARK_PURPLE;
+                default -> ChatColor.GRAY;
+            };
+            worldColours.add(color);
         }
 
+        String[] worlds = worldNames.toArray(String[]::new);
+        ChatColor[] colours = worldColours.toArray(ChatColor[]::new);
+        messageSender.sendMessage(sender, formatter.D + "     Worlds loaded\n" + formatter.D +"==================\n" + String.join("\n", worlds), colours);
         return true;
     }
 
     private boolean help(CommandSender sender, String[] args) {
-        int maxPageLines = 9;
-        int commandsLength = commandManager.getTopLevel().size() + commandManager.getLevelOne().size();
-        int totalPages = commandsLength / maxPageLines + (commandsLength % maxPageLines == 0 ? 0 : 1);
+        if(sender instanceof Player player) {
+            int maxPageLines = 9;
+            int commandsLength = commandManager.getTopLevel().size() + commandManager.getLevelOne().size();
+            int totalPages = commandsLength / maxPageLines + (commandsLength % maxPageLines == 0 ? 0 : 1);
 
-        try {
-            int page = Integer.parseInt(args[0]);
-            if(page > totalPages) {
-                throw new NumberFormatException();
+            try {
+                int page = Integer.parseInt(args[0]);
+                if(page > totalPages) {
+                    throw new NumberFormatException();
+                }
+                player.sendMessage(formatter.help(page, totalPages, maxPageLines));
+            } catch(NumberFormatException e) {
+                player.sendMessage(formatter.format("Unknown Chapter", ChatColor.DARK_RED));
+            } catch(ArrayIndexOutOfBoundsException e) {
+                player.sendMessage(formatter.help(1, totalPages, maxPageLines));
             }
-            sender.sendMessage(formatter.help(page, totalPages, maxPageLines));
-        } catch(NumberFormatException e) {
-            sender.sendMessage(formatter.format("Unknown Chapter", ChatColor.DARK_RED));
-        } catch(ArrayIndexOutOfBoundsException e) {
-            sender.sendMessage(formatter.help(1, totalPages, maxPageLines));
+        } else {
+            sender.sendMessage("help is currently not formatted for the console.");
         }
-
+       
         return true;
     }
 
