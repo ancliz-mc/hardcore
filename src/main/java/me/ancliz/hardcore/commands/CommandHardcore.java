@@ -10,23 +10,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
 import me.ancliz.hardcore.actions.WorldAction;
+import me.ancliz.minecraft.annotations.CommandMapping;
 import me.ancliz.minecraft.commands.CommandManager;
 import me.ancliz.minecraft.commands.DefaultCommandExecutor;
 
+@SuppressWarnings("deprecation")
 public class CommandHardcore extends DefaultCommandExecutor {
     private WorldAction worldAction;
 
     public CommandHardcore(CommandManager commandManager) {
         super(commandManager);
         worldAction = new WorldAction();
-        commandManager.registerHandler("hardcore.version", this::version);
-        commandManager.registerHandler("hardcore.help", this::help);
-        commandManager.registerHandler("hardcore.world", this::handleWorld);
-        commandManager.registerHandler("hardcore.new", this::handleNew);
-        commandManager.registerHandler("hardcore.goto", this::handleGoto);
-        commandManager.registerHandler("hardcore.unload", this::handleUnload);
-        commandManager.registerHandler("hardcore.delete", this::handleDelete);
-        commandManager.registerHandler("hardcore.list", this::handleList);
     }
 
     @Override
@@ -39,11 +33,13 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return super.onCommand(sender, command, label, args);
     }
 
+    @CommandMapping("hardcore.version")
     private boolean version(CommandSender sender, String[] args) {
         messageSender.sendMessage(sender, Hardcore.getInstance().getDescription().getVersion(), formatter::pluginMessage);
         return true;
     }
 
+    @CommandMapping("hardcore.world")
     private boolean handleWorld(CommandSender sender, String[] args) {
         if(!(sender instanceof Player player) || args.length > 0) {
             return false;
@@ -52,6 +48,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
+    @CommandMapping("hardcore.new")
     private boolean handleNew(CommandSender sender, String[] args) {
         Environment environment = Environment.NORMAL;
         if(args.length < 2 || args.length > 3) {
@@ -68,6 +65,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
+    @CommandMapping("hardcore.goto")
     private boolean handleGoto(CommandSender sender, String[] args) {
         if(!(sender instanceof Player player)) {
             return true;
@@ -91,6 +89,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
 
     }
 
+    @CommandMapping("hardcore.unload")
     private boolean handleUnload(CommandSender sender, String[] args) {
         String message;
         try {
@@ -105,6 +104,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
+    @CommandMapping("hardcore.delete")
     private boolean handleDelete(CommandSender sender, String[] args) {
         boolean deleted = worldAction.deleteWorld(args[0]);
         String message = deleted ? "World deleted." : "World is still loaded, unable to delete.";
@@ -112,6 +112,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
+    @CommandMapping("hardcore.list")
     private boolean handleList(CommandSender sender, String[] args) {
         List<String> worldNames = new ArrayList<>();
         List<ChatColor> worldColours = new ArrayList<>();
@@ -136,6 +137,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
+    @CommandMapping("hardcore.help")
     private boolean help(CommandSender sender, String[] args) {
         if(sender instanceof Player player) {
             int maxPageLines = 9;
