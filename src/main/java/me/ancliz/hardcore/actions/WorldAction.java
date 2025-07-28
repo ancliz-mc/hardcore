@@ -14,7 +14,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
-import me.ancliz.hardcore.WorldMetaData;
+import me.ancliz.minecraft.metadata.WorldMetadata;
 import me.ancliz.util.logging.Logger;
 
 public class WorldAction {
@@ -49,7 +49,7 @@ public class WorldAction {
         revokeAdvancements();
     }
 
-    public void setMetadataAndSettings(World world, Map<String, WorldMetaData> data) {
+    public void setMetadataAndSettings(World world, Map<String, WorldMetadata> data) {
         data.forEach(world::setMetadata);
         reset(world);
     }
@@ -58,7 +58,7 @@ public class WorldAction {
         return createWorld(fullyQualifiedName, environment, new HashMap<>());
     }
 
-    public World createWorld(String fullyQualifiedName, Environment environment, Map<String, WorldMetaData> data) {
+    public World createWorld(String fullyQualifiedName, Environment environment, Map<String, WorldMetadata> data) {
         if(!Bukkit.isTickingWorlds()) {
             WorldCreator creator = new WorldCreator(fullyQualifiedName).environment(environment);
             setMetadataAndSettings(Bukkit.createWorld(creator), data);
@@ -67,7 +67,7 @@ public class WorldAction {
         return null;
     }
 
-    public String createWorldGroup(String group, Map<String, WorldMetaData> data) {
+    public String createWorldGroup(String group, Map<String, WorldMetadata> data) {
         createWorld(group + "_nether", Environment.NETHER, data);
         createWorld(group, Environment.NORMAL, data);
         createWorld(group + "_the_end", Environment.THE_END);

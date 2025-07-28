@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import me.ancliz.hardcore.util.Metadata;
+import me.ancliz.minecraft.metadata.Metadata;
 import me.ancliz.util.logging.Logger;
 
 public class PlayerPortalListener implements Listener {

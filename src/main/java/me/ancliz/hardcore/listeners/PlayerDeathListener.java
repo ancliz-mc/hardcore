@@ -9,10 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import me.ancliz.hardcore.Hardcore;
-import me.ancliz.hardcore.WorldMetaData;
 import me.ancliz.hardcore.actions.WorldAction;
-import me.ancliz.hardcore.util.Metadata;
 import me.ancliz.minecraft.AnkyPlugin;
+import me.ancliz.minecraft.metadata.Metadata;
+import me.ancliz.minecraft.metadata.WorldMetadata;
 import me.ancliz.util.logging.Logger;
 
 public class PlayerDeathListener implements Listener {
@@ -41,7 +41,7 @@ public class PlayerDeathListener implements Listener {
         FileConfiguration config = plugin.getConfig();
 
         worldAction.createWorldGroup(newWorldGroup,
-                Metadata.mapBuilder((plugin, value) -> new WorldMetaData(plugin, value))
+                Metadata.mapBuilder((plugin, value) -> new WorldMetadata(plugin, value))
                         .put("base-name", baseName)
                         .put("group", newWorldGroup)
                         .put("iteration", statistics.getInt("attempts"))
