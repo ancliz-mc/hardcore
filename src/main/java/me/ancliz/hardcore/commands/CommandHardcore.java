@@ -16,7 +16,7 @@ import me.ancliz.minecraft.commands.CommandManager;
 import me.ancliz.minecraft.commands.DefaultCommandExecutor;
 
 @SuppressWarnings("deprecation")
-@CommandExecutor("hardcore")
+@CommandExecutor(name = "hardcore", aliases = {"hc"})
 public class CommandHardcore extends DefaultCommandExecutor {
     private WorldAction worldAction;
 
@@ -35,13 +35,15 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return super.onCommand(sender, command, label, args);
     }
 
-    @CommandMapping("hardcore.version")
+    @CommandMapping(fullyQualifiedName = "hardcore.version", usage = "/hardcore version", aliases = {"ver", "v", "-v", "-version"},
+                    topLevelAliases = {"hcv"}, description = "The current version of ${rootProject.name}.")
     private boolean version(CommandSender sender, String[] args) {
         messageSender.sendMessage(sender, Hardcore.getInstance().getDescription().getVersion(), formatter::pluginMessage);
         return true;
     }
 
-    @CommandMapping("hardcore.world")
+    @CommandMapping(fullyQualifiedName = "hardcore.world", usage = "/hardcore world", aliases = {"w"},
+                    topLevelAliases = {"hcw"}, description = "Display the world you are currently in.")
     private boolean handleWorld(CommandSender sender, String[] args) {
         if(!(sender instanceof Player player) || args.length > 0) {
             return false;
@@ -50,7 +52,8 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping("hardcore.new")
+    @CommandMapping(fullyQualifiedName = "hardcore.new", usage = "/hardcore new <world>", aliases = {"create"},
+                    topLevelAliases = {"hcnew"}, description = "Create a new world.")
     private boolean handleNew(CommandSender sender, String[] args) {
         Environment environment = Environment.NORMAL;
         if(args.length < 2 || args.length > 3) {
@@ -67,7 +70,8 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping("hardcore.goto")
+    @CommandMapping(fullyQualifiedName = "hardcore.goto", usage = "/hardcore goto <world>",
+                    aliases = {"tp", "ch"}, description = "Teleport player(s) to a world.")
     private boolean handleGoto(CommandSender sender, String[] args) {
         if(!(sender instanceof Player player)) {
             return true;
@@ -91,7 +95,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
 
     }
 
-    @CommandMapping("hardcore.unload")
+    @CommandMapping( fullyQualifiedName = "hardcore.unload", usage = "/hardcore unload <world>", description = "Unload a world.")
     private boolean handleUnload(CommandSender sender, String[] args) {
         String message;
         try {
@@ -106,7 +110,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping("hardcore.delete")
+    @CommandMapping(fullyQualifiedName = "hardcore.delete", usage = "/hardcore delete <world>", description = "Delete a world.")
     private boolean handleDelete(CommandSender sender, String[] args) {
         boolean deleted = worldAction.deleteWorld(args[0]);
         String message = deleted ? "World deleted." : "World is still loaded, unable to delete.";
@@ -114,7 +118,8 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping("hardcore.list")
+    @CommandMapping(fullyQualifiedName = "hardcore.list", usage = "/hardcore list", aliases = {"l", "ls"},
+                    topLevelAliases = "hcl", description = "List all loaded worlds.")
     private boolean handleList(CommandSender sender, String[] args) {
         List<String> worldNames = new ArrayList<>();
         List<ChatColor> worldColours = new ArrayList<>();
@@ -139,7 +144,8 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping("hardcore.help")
+    @CommandMapping(fullyQualifiedName = "hardcore.help", usage = "/hardcore help", aliases = {"h", "-h", "?"},
+                    topLevelAliases = {"hch"}, description = "Display all ${rootProject.name} commands and descriptions.")
     private boolean help(CommandSender sender, String[] args) {
         if(sender instanceof Player player) {
             int maxPageLines = 9;
