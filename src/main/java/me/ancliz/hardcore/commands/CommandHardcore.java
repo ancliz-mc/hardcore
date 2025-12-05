@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
 import me.ancliz.hardcore.actions.WorldAction;
+import me.ancliz.hardcore.listeners.SettingsListener;
 import me.ancliz.minecraft.annotations.CommandExecutor;
 import me.ancliz.minecraft.annotations.CommandMapping;
 import me.ancliz.minecraft.commands.DefaultCommandExecutor;
@@ -18,10 +19,16 @@ import me.ancliz.minecraft.commands.DefaultCommandExecutor;
 @CommandExecutor(name = "hardcore", aliases = {"hc"})
 public class CommandHardcore extends DefaultCommandExecutor {
     private WorldAction worldAction;
+    private List<SettingsListener> settingsListeners;
 
     public CommandHardcore() {
         super();
         worldAction = new WorldAction();
+        settingsListeners = new ArrayList<SettingsListener>();
+    }
+
+    public void registerSettingsListener(SettingsListener listener) {
+        settingsListeners.add(listener);
     }
 
     @Override
@@ -38,6 +45,24 @@ public class CommandHardcore extends DefaultCommandExecutor {
                     topLevelAliases = {"hcv"}, description = "The current version of ${rootProject.name}.")
     private boolean version(CommandSender sender, String[] args) {
         messageSender.sendMessage(sender, Hardcore.getInstance().getDescription().getVersion(), formatter::pluginMessage);
+        return true;
+    }
+
+   @CommandMapping(fullyQualifiedName = "hardcore.settings",
+                    usage = "/hardcore settings <setting> <value>",
+                    description = "Command for editing config and various settings.")
+    private boolean settings(CommandSender sender, String[] args) {
+        try {
+            if(args[0].equalsIgnoreCase("worlddeletion")) {
+                boolean value = Boolean.parseBoolean(args[1]);
+                WorldAction.setAllowWorldDeletion(value);
+                messageSender.sendMessage(sender, "set " + args[0] + " to "
+                    + WorldAction.getAllowWorldDeletion(), formatter::pluginMessage);
+            }
+        } catch(IndexOutOfBoundsException e) {
+                return false;
+        }
+        settingsListeners.forEach(s -> s.update());
         return true;
     }
 

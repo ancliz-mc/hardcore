@@ -20,10 +20,14 @@ import me.ancliz.util.logging.Logger;
 
 public class WorldAction {
     private final Logger logger = new Logger(this.getClass());
-    private boolean allowWorldDeletion = AnkyPlugin.getInstance().getConfig().getBoolean("allow-world-deletion");
+    private static boolean allowWorldDeletion = AnkyPlugin.getInstance().getConfig().getBoolean("allow-world-deletion");
 
-    public void setAllowWorldDeletion(boolean v) {
+    public static void setAllowWorldDeletion(boolean v) {
         allowWorldDeletion = v;
+    }
+
+    public static boolean getAllowWorldDeletion() {
+        return allowWorldDeletion;
     }
 
     @SuppressWarnings("unchecked")
