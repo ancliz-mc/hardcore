@@ -14,11 +14,17 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.ancliz.hardcore.Hardcore;
+import me.ancliz.minecraft.AnkyPlugin;
 import me.ancliz.minecraft.metadata.WorldMetadata;
 import me.ancliz.util.logging.Logger;
 
 public class WorldAction {
     private final Logger logger = new Logger(this.getClass());
+    private boolean allowWorldDeletion = AnkyPlugin.getInstance().getConfig().getBoolean("allow-world-deletion");
+
+    public void setAllowWorldDeletion(boolean v) {
+        allowWorldDeletion = v;
+    }
 
     @SuppressWarnings("unchecked")
     private <T> void setGameRules(World world, ConfigurationSection rules, Class<T> clazz) {
@@ -68,6 +74,7 @@ public class WorldAction {
     }
 
     public String createWorldGroup(String group, Map<String, WorldMetadata> data) {
+        logger.debug(data);
         createWorld(group + "_nether", Environment.NETHER, data);
         createWorld(group, Environment.NORMAL, data);
         createWorld(group + "_the_end", Environment.THE_END);
@@ -99,6 +106,8 @@ public class WorldAction {
     }
 
     public boolean deleteWorld(String worldName) {
+        if(!allowWorldDeletion)
+            return false;
         World world = Bukkit.getWorld(worldName);
         logger.warn("Deleting {}", worldName);
         if(world == null) {

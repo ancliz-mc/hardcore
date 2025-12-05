@@ -41,24 +41,30 @@ public class PlayerDeathListener implements Listener {
         FileConfiguration config = plugin.getConfig();
 
         worldAction.createWorldGroup(newWorldGroup,
-                Metadata.mapBuilder((plugin, value) -> new WorldMetadata(plugin, value))
+                Metadata.mapBuilder((plugin, value) ->
+                            new WorldMetadata(plugin, value))
                         .put("base-name", baseName)
                         .put("group", newWorldGroup)
                         .put("iteration", statistics.getInt("attempts"))
                         .build());
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    worldAction.teleportToWorld(Bukkit.getWorld(newWorldGroup), Bukkit.getServer().getOnlinePlayers());
-                    worldAction.revokeAdvancements();
-                }, config.getLong("world-teleport-delay"));
+            worldAction.teleportToWorld(Bukkit.getWorld(newWorldGroup), Bukkit.getServer().getOnlinePlayers());
+            worldAction.revokeAdvancements();
+        }, config.getLong("world-teleport-delay"));
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             if(groupName.equals("world")) {
                 logger.warn("Attempting to unload default worlds, aborting.");
                 return;
             }
+
             worldAction.unloadWorldGroup(groupName);
-            worldAction.deleteWorldGroup(groupName);
+
+            if(!worldAction.deleteWorldGroup(groupName)) {
+                logger.info("World deletion disabled, world files will be kept.");
+            }
+
         }, config.getLong("world-delete-delay"));
 
         plugin.saveYaml(statistics, "statistics.yml");
