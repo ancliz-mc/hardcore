@@ -1,75 +1,76 @@
 name: Hardcore
-version: '${version}'
+version: ${version}
 main: me.ancliz.hardcore.Hardcore
 api-version: '1.20'
 author: Ancliz
 website: https://github.com/ancliz-mc/hardcore
-softdepend: [EssentialsX]
-
+softdepend:
+- EssentialsX
 commands:
   hardcore:
-    aliases:
-      - hc
+    description: ''
     usage: /hardcore help
+    top-level-aliases: []
+    aliases:
+    - hc
     sub-commands:
       reload:
         description: Reload the plugin.
-
       version:
         description: The current version of ${rootProject.name}.
+        usage: /hardcore version
         top-level-aliases:
-          - hcv
+        - hcv
         aliases:
-          - ver
-          - v
-          - -v
-          - -version
-
+        - ver
+        - v
+        - -v
+        - -version
       help:
         description: Display all ${rootProject.name} commands and descriptions.
-        aliases:
-          - h
-          - '?'
-          - '-h'
+        usage: /hardcore help
         top-level-aliases:
-          - hch
-
+        - hch
+        aliases:
+        - h
+        - -h
+        - '?'
       world:
         description: Display the world you are currently in.
         usage: /hardcore world
         top-level-aliases:
-          - hcw
+        - hcw
         aliases:
-          - w
-
+        - w
       list:
         description: List all loaded worlds.
         usage: /hardcore list
         top-level-aliases:
-          - hcl
+        - hcl
         aliases:
-          - l
-          - ls
-
+        - l
+        - ls
       goto:
         description: Teleport player(s) to a world.
         usage: /hardcore goto <world>
+        top-level-aliases: []
         aliases:
-          - tp
-          - ch
-
+        - tp
+        - ch
       new:
         description: Create a new world.
         usage: /hardcore new <world>
         top-level-aliases:
-          - hcnew
+        - hcnew
         aliases:
         - create
-
       unload:
         description: Unload a world.
         usage: /hardcore unload <world>
-
+        top-level-aliases: []
+        aliases: []
       delete:
         description: Delete a world.
         usage: /hardcore delete <world>
+        top-level-aliases: []
+        aliases: []

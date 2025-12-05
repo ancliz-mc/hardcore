@@ -12,7 +12,6 @@ import me.ancliz.hardcore.Hardcore;
 import me.ancliz.hardcore.actions.WorldAction;
 import me.ancliz.minecraft.annotations.CommandExecutor;
 import me.ancliz.minecraft.annotations.CommandMapping;
-import me.ancliz.minecraft.commands.CommandManager;
 import me.ancliz.minecraft.commands.DefaultCommandExecutor;
 
 @SuppressWarnings("deprecation")
@@ -20,8 +19,8 @@ import me.ancliz.minecraft.commands.DefaultCommandExecutor;
 public class CommandHardcore extends DefaultCommandExecutor {
     private WorldAction worldAction;
 
-    public CommandHardcore(CommandManager commandManager) {
-        super(commandManager);
+    public CommandHardcore() {
+        super();
         worldAction = new WorldAction();
     }
 
