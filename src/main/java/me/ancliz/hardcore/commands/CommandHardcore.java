@@ -41,8 +41,11 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return super.onCommand(sender, command, label, args);
     }
 
-    @CommandMapping(fullyQualifiedName = "hardcore.version", usage = "/hardcore version", aliases = {"ver", "v", "-v", "-version"},
-                    topLevelAliases = {"hcv"}, description = "The current version of ${rootProject.name}.")
+    @CommandMapping(fullyQualifiedName = "hardcore.version",
+                    usage = "/hardcore version",
+                    aliases = {"ver", "v", "-v", "-version"},
+                    topLevelAliases = {"hcv"},
+                    description = "The current version of ${rootProject.name}.")
     private boolean version(CommandSender sender, String[] args) {
         messageSender.sendMessage(sender, Hardcore.getInstance().getDescription().getVersion(), formatter::pluginMessage);
         return true;
@@ -66,8 +69,11 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping(fullyQualifiedName = "hardcore.world", usage = "/hardcore world", aliases = {"w"},
-                    topLevelAliases = {"hcw"}, description = "Display the world you are currently in.")
+    @CommandMapping(fullyQualifiedName = "hardcore.world",
+                    usage = "/hardcore world",
+                    aliases = {"w"},
+                    topLevelAliases = {"hcw"},
+                    description = "Display the world you are currently in.")
     private boolean handleWorld(CommandSender sender, String[] args) {
         if(!(sender instanceof Player player) || args.length > 0) {
             return false;
@@ -76,7 +82,9 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping(fullyQualifiedName = "hardcore.new", usage = "/hardcore new <world>", aliases = {"create"},
+    @CommandMapping(fullyQualifiedName = "hardcore.new",
+                    usage = "/hardcore new <world>",
+                    aliases = {"create"},
                     topLevelAliases = {"hcnew"}, description = "Create a new world.")
     private boolean handleNew(CommandSender sender, String[] args) {
         Environment environment = Environment.NORMAL;
@@ -94,8 +102,10 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping(fullyQualifiedName = "hardcore.goto", usage = "/hardcore goto <world>",
-                    aliases = {"tp", "ch"}, description = "Teleport player(s) to a world.")
+    @CommandMapping(fullyQualifiedName = "hardcore.goto",
+                    usage = "/hardcore goto <world>",
+                    aliases = {"tp", "ch"},
+                    description = "Teleport player(s) to a world.")
     private boolean handleGoto(CommandSender sender, String[] args) {
         if(!(sender instanceof Player player)) {
             return true;
@@ -119,7 +129,7 @@ public class CommandHardcore extends DefaultCommandExecutor {
 
     }
 
-    @CommandMapping( fullyQualifiedName = "hardcore.unload", usage = "/hardcore unload <world>", description = "Unload a world.")
+    @CommandMapping(fullyQualifiedName = "hardcore.unload", usage = "/hardcore unload <world>", description = "Unload a world.")
     private boolean handleUnload(CommandSender sender, String[] args) {
         String message;
         try {
@@ -142,8 +152,11 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping(fullyQualifiedName = "hardcore.list", usage = "/hardcore list", aliases = {"l", "ls"},
-                    topLevelAliases = "hcl", description = "List all loaded worlds.")
+    @CommandMapping(fullyQualifiedName = "hardcore.list",
+                    usage = "/hardcore list",
+                    aliases = {"l", "ls"},
+                    topLevelAliases = "hcl",
+                    description = "List all loaded worlds.")
     private boolean handleList(CommandSender sender, String[] args) {
         List<String> worldNames = new ArrayList<>();
         List<ChatColor> worldColours = new ArrayList<>();
@@ -168,8 +181,11 @@ public class CommandHardcore extends DefaultCommandExecutor {
         return true;
     }
 
-    @CommandMapping(fullyQualifiedName = "hardcore.help", usage = "/hardcore help", aliases = {"h", "-h", "?"},
-                    topLevelAliases = {"hch"}, description = "Display all ${rootProject.name} commands and descriptions.")
+    @CommandMapping(fullyQualifiedName = "hardcore.help",
+                    usage = "/hardcore help",
+                    aliases = {"h", "-h", "?"},
+                    topLevelAliases = {"hch"},
+                    description = "Display all ${rootProject.name} commands and descriptions.")
     private boolean help(CommandSender sender, String[] args) {
         if(sender instanceof Player player) {
             int maxPageLines = 9;
