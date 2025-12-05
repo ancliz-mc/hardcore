@@ -74,3 +74,13 @@ commands:
         usage: /hardcore delete <world>
         top-level-aliases: []
         aliases: []
+      settings:
+        description: Command for editing config and various settings.
+        usage: /hardcore settings <setting> <value>
+        top-level-aliases:
+        - hcv
+        aliases:
+        - ver
+        - v
+        - -v
+        - -version

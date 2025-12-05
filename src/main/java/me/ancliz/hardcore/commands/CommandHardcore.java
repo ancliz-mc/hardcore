@@ -106,9 +106,9 @@ public class CommandHardcore extends DefaultCommandExecutor {
         } else {
             double[] coords = new double[3];
             try {
-                coords[0] = Double.parseDouble(args[0]);
-                coords[1] = args.length == 2 ? player.getLocation().getY() : Double.parseDouble(args[1]);
-                coords[2] = Double.parseDouble(args[args.length == 2 ? 1 : 2]);
+                coords[0] = Double.parseDouble(args[1]);
+                coords[1] = args.length == 3 ? player.getLocation().getY() : Double.parseDouble(args[2]);
+                coords[2] = Double.parseDouble(args[args.length == 3 ? 2 : 3]);
             } catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 player.sendMessage(formatter.pluginMessage("Invalid coordinates."));
                 return false;
